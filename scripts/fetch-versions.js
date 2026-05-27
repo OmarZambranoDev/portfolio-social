@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { writeFileSync, existsSync, unlinkSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import process from 'process';
@@ -8,6 +8,12 @@ const outputPath = resolve(__dirname, '..', '.canonical-versions.json');
 
 const HOST_VERSIONS_URL =
   'https://raw.githubusercontent.com/OmarZambranoDev/portfolio-landing-vite/main/versions.json';
+
+// Delete cached file so we always get the latest
+if (existsSync(outputPath)) {
+  unlinkSync(outputPath);
+  console.log('🗑️  Removed cached .canonical-versions.json');
+}
 
 try {
   const response = await fetch(HOST_VERSIONS_URL);
