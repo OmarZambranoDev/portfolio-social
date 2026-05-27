@@ -1,1 +1,1 @@
-npx lint-staged
+npm run fetch-versions && npm run check-versions && npx lint-staged

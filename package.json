@@ -1,10 +1,10 @@
 {
-  "name": "portfolio-REMOTE",
+  "name": "portfolio-social",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 300X",
+    "dev": "vite --port 3004",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest --run",
@@ -16,7 +16,6 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\"",
     "fetch-versions": "node scripts/fetch-versions.js",
     "check-versions": "node scripts/check-versions.js",
-    "predev": "npm run fetch-versions && npm run check-versions",
     "prebuild": "npm run fetch-versions && npm run check-versions",
     "prepare": "husky"
   },
@@ -33,6 +32,7 @@
     "@module-federation/vite": "^1.15.2",
     "@OmarZambranoDev/portfolio-ui": "latest",
     "clsx": "^2.1.0",
+    "date-fns": "^4.3.0",
     "lucide-react": "^0.400.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

@@ -3,3 +3,4 @@ dist
 .vite
 .canonical-versions.json
 *.local
+.env

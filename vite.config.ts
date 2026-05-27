@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: 'REMOTE_NAME',
+      name: 'social',
       filename: 'remoteEntry.js',
       exposes: {
-        './REMOTE_APP': './src/App',
-        './REMOTE_Styles': './src/index.css',
+        './SocialApp': './src/App',
+        './SocialStyles': './src/index.css',
       },
       shared: {
         react: { singleton: true, requiredVersion: '18.2.0' },
@@ -36,11 +36,11 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 3004,
     cors: true,
   },
   preview: {
-    port: 3000,
+    port: 3004,
     cors: true,
   },
 });
