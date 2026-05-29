@@ -11,8 +11,9 @@ interface SocialStore {
   currentUserId: string;
 
   // UI state
-  activeTab: 'feed' | 'friends';
+  activeTab: 'feed' | 'friends' | 'profile';
   viewedUserId: string | null;
+  isSearching: boolean;
   searchQuery: string;
   searchResults: User[];
   isLoadingMore: boolean;
@@ -59,8 +60,9 @@ interface SocialStore {
   updateBio: (bio: string) => void;
 
   // Navigation
-  setActiveTab: (tab: 'feed' | 'friends') => void;
+  setActiveTab: (tab: 'feed' | 'friends' | 'profile') => void;
   viewProfile: (userId: string | null) => void;
+  setSearching: (searching: boolean) => void;
   setSearchQuery: (query: string) => void;
 
   // Notification actions
@@ -121,6 +123,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   // UI state
   activeTab: 'feed',
   viewedUserId: null,
+  isSearching: false,
   searchQuery: '',
   searchResults: [],
   isLoadingMore: false,
@@ -326,12 +329,36 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
   // ============ Navigation ============
 
-  setActiveTab: (tab: 'feed' | 'friends') => {
-    set({ activeTab: tab, viewedUserId: null, searchQuery: '', searchResults: [] });
+  setActiveTab: (tab: 'feed' | 'friends' | 'profile') => {
+    if (tab === 'profile') {
+      set({
+        activeTab: 'profile',
+        viewedUserId: 'current-user',
+        isSearching: false,
+        searchQuery: '',
+        searchResults: [],
+      });
+    } else {
+      set({
+        activeTab: tab,
+        viewedUserId: null,
+        isSearching: false,
+        searchQuery: '',
+        searchResults: [],
+      });
+    }
   },
 
   viewProfile: (userId: string | null) => {
     set({ viewedUserId: userId });
+  },
+
+  setSearching: (searching: boolean) => {
+    if (searching) {
+      set({ isSearching: true, searchQuery: '' });
+    } else {
+      set({ isSearching: false, searchQuery: '', searchResults: [] });
+    }
   },
 
   setSearchQuery: (query: string) => {
@@ -340,10 +367,11 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
       set({ searchQuery: '', searchResults: [] });
       return;
     }
+    set({ searchQuery: query, isSearching: true });
     const results = Object.values(users).filter(
       (u) => u.id !== currentUserId && u.name.toLowerCase().includes(query.toLowerCase())
     );
-    set({ searchQuery: query, searchResults: results });
+    set({ searchResults: results });
   },
 
   // ============ Notification Actions ============
@@ -429,14 +457,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
   generateRandomPost: () => {
     const { users, currentUserId } = get();
-    const allUsers = Object.values(users);
-    // Bias toward other users (80%), sometimes "You" (20%)
-    const author =
-      Math.random() < 0.2
-        ? users[currentUserId]
-        : allUsers.filter((u) => u.id !== currentUserId)[
-            Math.floor(Math.random() * (allUsers.length - 1))
-          ];
+    const otherUsers = Object.values(users).filter((u) => u.id !== currentUserId);
+    const author = otherUsers[Math.floor(Math.random() * otherUsers.length)];
 
     const content = MOCK_CONTENT_SIM[Math.floor(Math.random() * MOCK_CONTENT_SIM.length)];
 

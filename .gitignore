@@ -4,3 +4,4 @@ dist
 .canonical-versions.json
 *.local
 .env
+.mf

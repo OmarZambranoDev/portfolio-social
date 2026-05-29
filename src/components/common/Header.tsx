@@ -1,5 +1,5 @@
 import { NotificationCenter } from '@OmarZambranoDev/portfolio-ui';
-import { useSocialStore } from '../store/socialStore';
+import { useSocialStore } from '../../store/socialStore';
 
 export function Header() {
   const uiNotifications = useSocialStore((state) => state.getUINotifications());
