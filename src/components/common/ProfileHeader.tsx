@@ -6,18 +6,18 @@ import type { User } from '../../types/social';
 interface ProfileHeaderProps {
   user: User;
   isCurrentUser: boolean;
-  isFriend: boolean;
-  onAddFriend: () => void;
-  onRemoveFriend: () => void;
+  isFollowing: boolean;
+  onFollow: () => void;
+  onUnfollow: () => void;
   onUpdateBio: (bio: string) => void;
 }
 
 export function ProfileHeader({
   user,
   isCurrentUser,
-  isFriend,
-  onAddFriend,
-  onRemoveFriend,
+  isFollowing,
+  onFollow,
+  onUnfollow,
   onUpdateBio,
 }: ProfileHeaderProps) {
   const [editingBio, setEditingBio] = useState(false);
@@ -89,20 +89,20 @@ export function ProfileHeader({
 
         {!isCurrentUser && !editingBio && (
           <div className="mt-4">
-            {isFriend ? (
+            {isFollowing ? (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={onRemoveFriend}
+                onClick={onUnfollow}
                 className="border-earth-stone/40 text-earth-moss hover:text-red-600 hover:border-red-300"
               >
                 <UserX className="w-3.5 h-3.5" />
-                Remove Friend
+                Unfollow
               </Button>
             ) : (
-              <Button variant="primary" size="sm" onClick={onAddFriend}>
+              <Button variant="primary" size="sm" onClick={onFollow}>
                 <UserPlus className="w-3.5 h-3.5" />
-                Add Friend
+                Follow
               </Button>
             )}
           </div>

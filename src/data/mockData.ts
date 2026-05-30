@@ -1,6 +1,5 @@
-import { User, Post, Friendship } from '../types/social';
+import { User, Post, Follow } from '../types/social';
 
-// --- Content Snippets ---
 const MOCK_CONTENT = [
   'Just finished building a micro-frontend architecture demo. Module Federation is incredible when it works.',
   'TypeScript has completely changed how I write code. The confidence it gives me during refactors is unmatched.',
@@ -34,7 +33,6 @@ const MOCK_CONTENT = [
   'The amount of JavaScript fatigue is real, but the ecosystem keeps improving.',
 ];
 
-// --- User Data ---
 const MOCK_USERS: Omit<User, 'id'>[] = [
   {
     name: 'Alex Chen',
@@ -138,7 +136,6 @@ const MOCK_USERS: Omit<User, 'id'>[] = [
   },
 ];
 
-// --- You User ---
 const CURRENT_USER: User = {
   id: 'current-user',
   name: 'You',
@@ -146,7 +143,6 @@ const CURRENT_USER: User = {
   avatar: 'https://picsum.photos/seed/currentuser/200',
 };
 
-// --- "You" user's seed posts (talk about micro-frontend project) ---
 const YOUR_SEED_POSTS = [
   'Working on my micro-frontend portfolio project! Setting up the host app and configuring Module Federation for the Vite remotes.',
   'Just got the social feed micro-frontend working with the host. The remote app loads dynamically — so cool to see it in action!',
@@ -160,7 +156,6 @@ const YOUR_SEED_POSTS = [
   'Just added the Avatar component to the shared UI library. Needed it for the Social app, but it will be reused across all the upcoming apps too.',
 ];
 
-// --- Helpers ---
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -175,11 +170,11 @@ function randomSubset<T>(arr: T[], min: number, max: number): T[] {
   return shuffled.slice(0, count);
 }
 
+let idCounter = 0;
 function generateId(): string {
-  return Math.random().toString(36).substring(2, 11);
+  return `${Date.now()}-${idCounter++}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-// --- Generate Users ---
 export function generateUsers(): User[] {
   const users = MOCK_USERS.map((u, i) => ({
     ...u,
@@ -188,42 +183,38 @@ export function generateUsers(): User[] {
   return [CURRENT_USER, ...users];
 }
 
-// --- Generate Friendships ---
-export function generateFriendships(users: User[]): Friendship[] {
-  const friendships: Friendship[] = [];
+export function generateFollows(users: User[]): Follow[] {
+  const follows: Follow[] = [];
   const addedPairs = new Set<string>();
 
-  const addFriendship = (u1: string, u2: string) => {
-    const pairKey = [u1, u2].sort().join('-');
+  const addFollow = (followerId: string, followingId: string) => {
+    const pairKey = `${followerId}-${followingId}`;
     if (!addedPairs.has(pairKey)) {
       addedPairs.add(pairKey);
-      friendships.push({ userId: u1, friendId: u2 });
-      friendships.push({ userId: u2, friendId: u1 });
+      follows.push({ followerId, followingId });
     }
   };
 
-  // "You" gets exactly 5 friends
-  const youFriends = randomSubset(users.slice(1), 5, 5);
-  youFriends.forEach((f) => addFriendship(CURRENT_USER.id, f.id));
+  // "You" follows exactly 5 users
+  const youFollows = randomSubset(users.slice(1), 5, 5);
+  youFollows.forEach((f) => addFollow(CURRENT_USER.id, f.id));
 
-  // Other users get 3-8 friends each
+  // Other users follow 3-8 users each
   users.slice(1).forEach((user) => {
-    const friendCount = randomInt(3, 8);
-    const potentialFriends = users.filter((u) => u.id !== user.id);
-    const friends = randomSubset(potentialFriends, friendCount, friendCount);
-    friends.forEach((f) => addFriendship(user.id, f.id));
+    const followCount = randomInt(3, 8);
+    const potentialFollows = users.filter((u) => u.id !== user.id);
+    const follows_ = randomSubset(potentialFollows, followCount, followCount);
+    follows_.forEach((f) => addFollow(user.id, f.id));
   });
 
-  return friendships;
+  return follows;
 }
 
-// --- Generate Posts ---
 export function generatePosts(users: User[]): Post[] {
   const now = Date.now();
   const fortyEightHours = 48 * 60 * 60 * 1000;
   const posts: Post[] = [];
 
-  // Generate "You" user's seed posts
   YOUR_SEED_POSTS.forEach((content, i) => {
     const post: Post = {
       id: `post-you-${i + 1}`,
@@ -234,11 +225,9 @@ export function generatePosts(users: User[]): Post[] {
       comments: [],
     };
 
-    // Random likes from other users
     const likers = randomSubset(users.slice(1), 0, 5);
     post.likes = likers.map((u) => u.id);
 
-    // 0-3 random comments
     const commentCount = randomInt(0, 3);
     for (let j = 0; j < commentCount; j++) {
       const commenter = randomElement(users);
@@ -246,14 +235,13 @@ export function generatePosts(users: User[]): Post[] {
         id: generateId(),
         userId: commenter.id,
         content: randomElement(MOCK_CONTENT.slice(0, 10)),
-        timestamp: post.timestamp + randomInt(60000, 3600000), // 1 min to 1 hour after post
+        timestamp: post.timestamp + randomInt(60000, 3600000),
       });
     }
 
     posts.push(post);
   });
 
-  // Generate 50 seed posts from random users
   for (let i = 0; i < 50; i++) {
     const author = randomElement(users);
     const post: Post = {
@@ -265,11 +253,9 @@ export function generatePosts(users: User[]): Post[] {
       comments: [],
     };
 
-    // Random likes
     const likers = randomSubset(users, 0, 5);
     post.likes = likers.map((u) => u.id);
 
-    // 0-3 random comments
     const commentCount = randomInt(0, 3);
     for (let j = 0; j < commentCount; j++) {
       const commenter = randomElement(users);
@@ -284,14 +270,12 @@ export function generatePosts(users: User[]): Post[] {
     posts.push(post);
   }
 
-  // Sort by timestamp, newest first
   return posts.sort((a, b) => b.timestamp - a.timestamp);
 }
 
-// --- Generate all data ---
 export function generateAllData() {
   const users = generateUsers();
-  const friendships = generateFriendships(users);
+  const follows = generateFollows(users);
   const posts = generatePosts(users);
-  return { users, friendships, posts };
+  return { users, follows, posts };
 }

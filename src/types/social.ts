@@ -21,9 +21,9 @@ export interface Post {
   comments: Comment[];
 }
 
-export interface Friendship {
-  userId: string;
-  friendId: string;
+export interface Follow {
+  followerId: string;
+  followingId: string;
 }
 
 export interface Notification {
@@ -32,8 +32,7 @@ export interface Notification {
   timestamp: number;
   read: boolean;
   icon: React.ReactNode;
-  // App-specific metadata (not passed to UI library)
-  _type: 'like' | 'comment' | 'friend_request';
+  _type: 'like' | 'comment' | 'follow';
   _fromUserId: string;
   _postId?: string;
 }

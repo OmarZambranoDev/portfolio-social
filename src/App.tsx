@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { ToastProvider, Tabs, TabsList, TabsTrigger } from '@OmarZambranoDev/portfolio-ui';
-import { Search, ChevronUp } from 'lucide-react';
+import { ChevronUp } from 'lucide-react';
 import { useSocialStore } from './store/socialStore';
 import { Header } from './components/common/Header';
 import { FeedView } from './components/desktop/FeedView';
-import { FriendsView } from './components/desktop/FriendsView';
+import { FollowingView } from './components/desktop/FollowingView';
 import { ProfileView } from './components/desktop/ProfileView';
 import { SearchView } from './components/desktop/SearchView';
 
@@ -40,11 +40,10 @@ export default function App() {
   const generateRandomPost = useSocialStore((s) => s.generateRandomPost);
   const generateRandomComment = useSocialStore((s) => s.generateRandomComment);
   const generateRandomLike = useSocialStore((s) => s.generateRandomLike);
-  const generateRandomFriendAdd = useSocialStore((s) => s.generateRandomFriendAdd);
+  const generateRandomFollow = useSocialStore((s) => s.generateRandomFollow);
 
   const showScrollTop = useFeedScrollState();
 
-  // Listen to window scroll since <html> is the scrollable element
   useEffect(() => {
     const handleWindowScroll = () => {
       feedScrollState.top = window.scrollY;
@@ -91,19 +90,19 @@ export default function App() {
     return () => clearTimeout(timeout);
   }, [generateRandomLike]);
 
-  // Simulation: random friend adds every 45-75 seconds
+  // Simulation: random follows every 45-75 seconds
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     const scheduleNext = () => {
       const delay = 45000 + Math.random() * 30000;
       timeout = setTimeout(() => {
-        generateRandomFriendAdd();
+        generateRandomFollow();
         scheduleNext();
       }, delay);
     };
     scheduleNext();
     return () => clearTimeout(timeout);
-  }, [generateRandomFriendAdd]);
+  }, [generateRandomFollow]);
 
   const showOverlay = (viewedUserId !== null && viewedUserId !== currentUserId) || isSearching;
 
@@ -122,7 +121,7 @@ export default function App() {
     <ToastProvider>
       <div className="h-full bg-gradient-to-b from-earth-stone/20 via-white to-earth-sand/20">
         <div className="max-w-[680px] mx-auto h-full flex flex-col">
-          <Header />
+          <Header onSearchClick={() => setSearching(true)} />
 
           {showOverlay ? (
             <>
@@ -133,34 +132,27 @@ export default function App() {
             </>
           ) : (
             <>
-              <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-earth-stone/30">
+              <div className="px-4 pt-4 pb-2 border-b border-earth-stone/30">
                 <Tabs
                   value={activeTab}
-                  onValueChange={(value) => setActiveTab(value as 'feed' | 'friends' | 'profile')}
+                  onValueChange={(value) => setActiveTab(value as 'feed' | 'following' | 'profile')}
                 >
                   <TabsList variant="underline">
                     <TabsTrigger variant="underline" value="feed">
                       Feed
                     </TabsTrigger>
-                    <TabsTrigger variant="underline" value="friends">
-                      Friends
-                    </TabsTrigger>
                     <TabsTrigger variant="underline" value="profile">
                       Profile
                     </TabsTrigger>
+                    <TabsTrigger variant="underline" value="following">
+                      Following
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
-
-                <button
-                  onClick={() => setSearching(true)}
-                  className="p-2 rounded-lg text-earth-moss hover:bg-muted/10"
-                >
-                  <Search className="w-5 h-5" />
-                </button>
               </div>
 
               {activeTab === 'feed' && <FeedView scrollState={feedScrollState} />}
-              {activeTab === 'friends' && <FriendsView />}
+              {activeTab === 'following' && <FollowingView />}
               {activeTab === 'profile' && <ProfileView userId={currentUserId} />}
             </>
           )}

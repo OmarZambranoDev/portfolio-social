@@ -1,26 +1,35 @@
 import { useSocialStore } from '../../store/socialStore';
-import { Avatar, SearchBar } from '@OmarZambranoDev/portfolio-ui';
+import { SearchBar } from '@OmarZambranoDev/portfolio-ui';
 import { ChevronLeft } from 'lucide-react';
+import { UserCard } from '../common/UserCard';
 
 export function SearchView() {
   const searchQuery = useSocialStore((s) => s.searchQuery);
   const searchResults = useSocialStore((s) => s.searchResults);
+  const follows = useSocialStore((s) => s.follows);
+  const currentUserId = useSocialStore((s) => s.currentUserId);
   const setSearchQuery = useSocialStore((s) => s.setSearchQuery);
-  const getMutualFriendCount = useSocialStore((s) => s.getMutualFriendCount);
+  const setSearching = useSocialStore((s) => s.setSearching);
+  const getMutualFollowCount = useSocialStore((s) => s.getMutualFollowCount);
+  const followUser = useSocialStore((s) => s.followUser);
+  const unfollowUser = useSocialStore((s) => s.unfollowUser);
   const viewProfile = useSocialStore((s) => s.viewProfile);
 
   const handleBack = () => {
-    setSearchQuery('');
-    viewProfile(null);
+    setSearching(false);
+  };
+
+  const isFollowing = (userId: string) => {
+    return follows.some((f) => f.followerId === currentUserId && f.followingId === userId);
   };
 
   const handleUserClick = (userId: string) => {
+    setSearching(false);
     viewProfile(userId);
   };
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* Back + Search Bar */}
       <div className="px-4 pt-4 pb-2 space-y-3">
         <button
           onClick={handleBack}
@@ -40,7 +49,6 @@ export function SearchView() {
         />
       </div>
 
-      {/* Search Results */}
       <div className="flex-1 overflow-y-auto px-4 py-2">
         {searchQuery.trim() === '' ? (
           <p className="text-sm text-earth-moss text-center py-8">Search for users by name.</p>
@@ -51,21 +59,15 @@ export function SearchView() {
         ) : (
           <div className="space-y-1">
             {searchResults.map((user) => (
-              <button
+              <UserCard
                 key={user.id}
-                onClick={() => handleUserClick(user.id)}
-                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/10 text-left transition-colors"
-              >
-                <Avatar src={user.avatar} alt={user.name} size="md" className="flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-earth-forest">{user.name}</p>
-                  <p className="text-xs text-earth-moss line-clamp-1">{user.bio}</p>
-                  <p className="text-xs text-earth-sage mt-0.5">
-                    {getMutualFriendCount(user.id)} mutual friend
-                    {getMutualFriendCount(user.id) !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </button>
+                user={user}
+                isFollowing={isFollowing(user.id)}
+                mutualFollowCount={getMutualFollowCount(user.id)}
+                onFollow={followUser}
+                onUnfollow={unfollowUser}
+                onClick={handleUserClick}
+              />
             ))}
           </div>
         )}

@@ -1,6 +1,7 @@
 export { PostCard } from './PostCard';
 export { NewPostInput } from './NewPostInput';
-export { FriendCard } from './FriendCard';
+export { FollowingCard } from './FollowingCard';
+export { UserCard } from './UserCard';
 export { ProfileHeader } from './ProfileHeader';
-export { MutualFriendsList } from './MutualFriendsList';
+export { MutualFollowsList } from './MutualFollowsList';
 export { Header } from './Header';

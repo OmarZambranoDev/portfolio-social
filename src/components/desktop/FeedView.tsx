@@ -17,15 +17,27 @@ interface FeedViewProps {
 
 export function FeedView({ scrollState }: FeedViewProps) {
   const allPosts = useSocialStore((s) => s.posts);
+  const currentUserId = useSocialStore((s) => s.currentUserId);
+  const follows = useSocialStore((s) => s.follows);
   const scrollTargetPostId = useSocialStore((s) => s.scrollTargetPostId);
   const clearScrollTarget = useSocialStore((s) => s.clearScrollTarget);
   const viewProfile = useSocialStore((s) => s.viewProfile);
+
+  // Compute followed user IDs (reactive)
+  const followingIds = new Set(
+    follows.filter((f) => f.followerId === currentUserId).map((f) => f.followingId)
+  );
+
+  // Filter all posts to only show followed users + own posts
+  const relevantPosts = allPosts.filter(
+    (p) => p.userId === currentUserId || followingIds.has(p.userId)
+  );
 
   const visiblePostsRef = useRef<Post[]>([]);
   const pendingRef = useRef<Post[]>([]);
   const displayedCountRef = useRef(POSTS_PER_PAGE);
   const initializedRef = useRef(false);
-  const prevAllPostsLength = useRef(0);
+  const prevRelevantPostsLength = useRef(0);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -35,7 +47,6 @@ export function FeedView({ scrollState }: FeedViewProps) {
 
   const [newPostsCount, setNewPostsCount] = useState(0);
 
-  // Pass the ref to scrollState on mount
   useEffect(() => {
     if (scrollState && scrollContainerRef.current) {
       scrollState.scrollContainerRef = scrollContainerRef.current;
@@ -43,9 +54,9 @@ export function FeedView({ scrollState }: FeedViewProps) {
   }, [scrollState]);
 
   // Initialize ONCE
-  if (!initializedRef.current && allPosts.length > 0) {
-    visiblePostsRef.current = allPosts.slice(0, POSTS_PER_PAGE);
-    prevAllPostsLength.current = allPosts.length;
+  if (!initializedRef.current && relevantPosts.length > 0) {
+    visiblePostsRef.current = relevantPosts.slice(0, POSTS_PER_PAGE);
+    prevRelevantPostsLength.current = relevantPosts.length;
     initializedRef.current = true;
   }
 
@@ -74,23 +85,35 @@ export function FeedView({ scrollState }: FeedViewProps) {
   useEffect(() => {
     if (!initializedRef.current) return;
 
-    const diff = allPosts.length - prevAllPostsLength.current;
+    const diff = relevantPosts.length - prevRelevantPostsLength.current;
     if (diff <= 0) return;
 
     const visibleIds = new Set(visiblePostsRef.current.map((p) => p.id));
     const pendingIds = new Set(pendingRef.current.map((p) => p.id));
-    const newPosts = allPosts
+    const newPosts = relevantPosts
       .slice(0, diff)
       .filter((p) => !visibleIds.has(p.id) && !pendingIds.has(p.id));
 
-    if (newPosts.length > 0) {
-      pendingRef.current = [...newPosts, ...pendingRef.current];
+    if (newPosts.length === 0) {
+      prevRelevantPostsLength.current = relevantPosts.length;
+      return;
+    }
+
+    const ownPosts = newPosts.filter((p) => p.userId === currentUserId);
+    const otherPosts = newPosts.filter((p) => p.userId !== currentUserId);
+
+    if (ownPosts.length > 0) {
+      visiblePostsRef.current = [...ownPosts, ...visiblePostsRef.current];
+    }
+
+    if (otherPosts.length > 0) {
+      pendingRef.current = [...otherPosts, ...pendingRef.current];
       setNewPostsCount(pendingRef.current.length);
     }
 
-    prevAllPostsLength.current = allPosts.length;
+    prevRelevantPostsLength.current = relevantPosts.length;
     rerender();
-  }, [allPosts.length, allPosts]);
+  }, [relevantPosts.length, relevantPosts, currentUserId]);
 
   // Infinite scroll
   useEffect(() => {
@@ -99,9 +122,9 @@ export function FeedView({ scrollState }: FeedViewProps) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && displayedCountRef.current < allPosts.length) {
+        if (entries[0].isIntersecting && displayedCountRef.current < relevantPosts.length) {
           const nextCount = displayedCountRef.current + POSTS_PER_PAGE;
-          visiblePostsRef.current = allPosts.slice(0, nextCount);
+          visiblePostsRef.current = relevantPosts.slice(0, nextCount);
           displayedCountRef.current = nextCount;
           rerender();
         }
@@ -111,7 +134,7 @@ export function FeedView({ scrollState }: FeedViewProps) {
 
     observer.observe(loader);
     return () => observer.disconnect();
-  }, [allPosts]);
+  }, [relevantPosts]);
 
   // Scroll to target post
   useEffect(() => {
@@ -135,7 +158,6 @@ export function FeedView({ scrollState }: FeedViewProps) {
     clearScrollTarget();
   }, [scrollTargetPostId, allPosts, clearScrollTarget]);
 
-  // Show new posts (banner click)
   const handleShowNewPosts = useCallback(() => {
     visiblePostsRef.current = [...pendingRef.current, ...visiblePostsRef.current];
     pendingRef.current = [];
@@ -145,7 +167,7 @@ export function FeedView({ scrollState }: FeedViewProps) {
   }, []);
 
   const visiblePosts = visiblePostsRef.current;
-  const hasMorePosts = displayedCountRef.current < allPosts.length;
+  const hasMorePosts = displayedCountRef.current < relevantPosts.length;
 
   return (
     <div className="flex-1 flex flex-col min-h-0">

@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 import { Heart, MessageCircle, UserPlus } from 'lucide-react';
-import { User, Post, Friendship, Notification, Comment } from '../types/social';
+import { User, Post, Follow, Notification, Comment } from '../types/social';
 import { generateAllData } from '../data/mockData';
 
 interface SocialStore {
   // Data
   users: Record<string, User>;
   posts: Post[];
-  friendships: Friendship[];
+  follows: Follow[];
   currentUserId: string;
 
   // UI state
-  activeTab: 'feed' | 'friends' | 'profile';
+  activeTab: 'feed' | 'following' | 'profile';
   viewedUserId: string | null;
   isSearching: boolean;
   searchQuery: string;
@@ -27,9 +27,10 @@ interface SocialStore {
   // Computed
   getCurrentUser: () => User;
   getUserById: (id: string) => User | undefined;
-  getFriendsForUser: (userId: string) => User[];
-  getMutualFriends: (userId: string) => User[];
-  getMutualFriendCount: (userId: string) => number;
+  getFollowingForUser: (userId: string) => User[];
+  getFollowersForUser: (userId: string) => User[];
+  getMutualFollows: (userId: string) => User[];
+  getMutualFollowCount: (userId: string) => number;
   getPostsForUser: (userId: string) => Post[];
   getFeedPosts: () => Post[];
   hasLiked: (postId: string) => boolean;
@@ -47,9 +48,10 @@ interface SocialStore {
   toggleLike: (postId: string, userId?: string) => void;
   addComment: (postId: string, content: string, userId?: string) => void;
 
-  // Friend actions
-  addFriend: (userId: string) => void;
-  removeFriend: (userId: string) => void;
+  // Follow actions
+  followUser: (userId: string) => void;
+  unfollowUser: (userId: string) => void;
+  isFollowing: (userId: string) => boolean;
 
   // Feed actions
   loadMorePosts: () => void;
@@ -60,7 +62,7 @@ interface SocialStore {
   updateBio: (bio: string) => void;
 
   // Navigation
-  setActiveTab: (tab: 'feed' | 'friends' | 'profile') => void;
+  setActiveTab: (tab: 'feed' | 'following' | 'profile') => void;
   viewProfile: (userId: string | null) => void;
   setSearching: (searching: boolean) => void;
   setSearchQuery: (query: string) => void;
@@ -70,7 +72,7 @@ interface SocialStore {
   markAllNotificationsRead: () => void;
   removeNotification: (id: string) => void;
   generateNotification: (
-    type: 'like' | 'comment' | 'friend_request',
+    type: 'like' | 'comment' | 'follow',
     fromUserId: string,
     postId?: string
   ) => void;
@@ -80,17 +82,12 @@ interface SocialStore {
   generateRandomPost: () => void;
   generateRandomComment: () => void;
   generateRandomLike: () => void;
-  generateRandomFriendAdd: () => void;
+  generateRandomFollow: () => void;
 }
 
 const POSTS_PER_PAGE = 10;
 
-// Initialize data
-const {
-  users: initialUsers,
-  friendships: initialFriendships,
-  posts: initialPosts,
-} = generateAllData();
+const { users: initialUsers, follows: initialFollows, posts: initialPosts } = generateAllData();
 const usersRecord: Record<string, User> = {};
 initialUsers.forEach((u) => {
   usersRecord[u.id] = u;
@@ -109,15 +106,16 @@ const MOCK_CONTENT_SIM = [
   'The future of the web is exciting. WASM, WebGPU, multi-threading in the browser.',
 ];
 
+let idCounter = 0;
 function generateId(): string {
-  return Math.random().toString(36).substring(2, 11);
+  return `${Date.now()}-${idCounter++}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 export const useSocialStore = create<SocialStore>((set, get) => ({
   // Initial data
   users: usersRecord,
   posts: initialPosts,
-  friendships: initialFriendships,
+  follows: initialFollows,
   currentUserId: 'current-user',
 
   // UI state
@@ -144,23 +142,29 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     return get().users[id];
   },
 
-  getFriendsForUser: (userId: string) => {
-    const { friendships, users } = get();
-    const friendIds = friendships.filter((f) => f.userId === userId).map((f) => f.friendId);
-    return friendIds.map((id) => users[id]).filter(Boolean);
+  getFollowingForUser: (userId: string) => {
+    const { follows, users } = get();
+    const followingIds = follows.filter((f) => f.followerId === userId).map((f) => f.followingId);
+    return followingIds.map((id) => users[id]).filter(Boolean);
   },
 
-  getMutualFriends: (userId: string) => {
+  getFollowersForUser: (userId: string) => {
+    const { follows, users } = get();
+    const followerIds = follows.filter((f) => f.followingId === userId).map((f) => f.followerId);
+    return followerIds.map((id) => users[id]).filter(Boolean);
+  },
+
+  getMutualFollows: (userId: string) => {
     const { currentUserId } = get();
     if (userId === currentUserId) return [];
-    const myFriends = get().getFriendsForUser(currentUserId);
-    const theirFriends = get().getFriendsForUser(userId);
-    const myFriendIds = new Set(myFriends.map((f) => f.id));
-    return theirFriends.filter((f) => myFriendIds.has(f.id));
+    const myFollowing = get().getFollowingForUser(currentUserId);
+    const theirFollowers = get().getFollowersForUser(userId);
+    const myFollowingIds = new Set(myFollowing.map((f) => f.id));
+    return theirFollowers.filter((f) => myFollowingIds.has(f.id));
   },
 
-  getMutualFriendCount: (userId: string) => {
-    return get().getMutualFriends(userId).length;
+  getMutualFollowCount: (userId: string) => {
+    return get().getMutualFollows(userId).length;
   },
 
   getPostsForUser: (userId: string) => {
@@ -217,7 +221,6 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
       const hasLiked = post.likes.includes(likerId);
 
-      // Generate notification if someone else likes the post
       if (!hasLiked && post.userId !== likerId) {
         get().generateNotification('like', likerId, postId);
       }
@@ -254,45 +257,41 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
       }),
     }));
 
-    // Notify post owner if someone else comments
     const post = get().posts.find((p) => p.id === postId);
     if (post && post.userId !== commenterId) {
       get().generateNotification('comment', commenterId, postId);
     }
   },
 
-  // ============ Friend Actions ============
+  // ============ Follow Actions ============
 
-  addFriend: (userId: string) => {
-    const { currentUserId, friendships } = get();
+  followUser: (userId: string) => {
+    const { currentUserId, follows } = get();
 
-    // Check if already friends
-    const alreadyFriends = friendships.some(
-      (f) => f.userId === currentUserId && f.friendId === userId
+    const alreadyFollowing = follows.some(
+      (f) => f.followerId === currentUserId && f.followingId === userId
     );
-    if (alreadyFriends) return;
+    if (alreadyFollowing) return;
 
     set((state) => ({
-      friendships: [
-        ...state.friendships,
-        { userId: currentUserId, friendId: userId },
-        { userId, friendId: currentUserId },
-      ],
+      follows: [...state.follows, { followerId: currentUserId, followingId: userId }],
     }));
 
-    // Notify the person being added
-    get().generateNotification('friend_request', currentUserId);
+    get().generateNotification('follow', currentUserId);
   },
 
-  removeFriend: (userId: string) => {
+  unfollowUser: (userId: string) => {
     const { currentUserId } = get();
     set((state) => ({
-      friendships: state.friendships.filter(
-        (f) =>
-          !(f.userId === currentUserId && f.friendId === userId) &&
-          !(f.userId === userId && f.friendId === currentUserId)
+      follows: state.follows.filter(
+        (f) => !(f.followerId === currentUserId && f.followingId === userId)
       ),
     }));
+  },
+
+  isFollowing: (userId: string) => {
+    const { follows, currentUserId } = get();
+    return follows.some((f) => f.followerId === currentUserId && f.followingId === userId);
   },
 
   // ============ Feed Actions ============
@@ -329,7 +328,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
   // ============ Navigation ============
 
-  setActiveTab: (tab: 'feed' | 'friends' | 'profile') => {
+  setActiveTab: (tab: 'feed' | 'following' | 'profile') => {
     if (tab === 'profile') {
       set({
         activeTab: 'profile',
@@ -395,7 +394,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   },
 
   generateNotification: (
-    type: 'like' | 'comment' | 'friend_request',
+    type: 'like' | 'comment' | 'follow',
     fromUserId: string,
     postId?: string
   ) => {
@@ -414,14 +413,14 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         message = `${fromUser.name} commented on your post`;
         icon = <MessageCircle className="w-4 h-4 text-primary" />;
         break;
-      case 'friend_request':
-        message = `${fromUser.name} added you as a friend`;
+      case 'follow':
+        message = `${fromUser.name} followed you`;
         icon = <UserPlus className="w-4 h-4 text-earth-sage" />;
         break;
     }
 
     const notification: Notification = {
-      id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      id: `notif-${generateId()}`,
       message,
       timestamp: Date.now(),
       read: false,
@@ -448,7 +447,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         get().scrollToPost(fullNotification._postId);
       }
     }
-    if (fullNotification._type === 'friend_request') {
+    if (fullNotification._type === 'follow') {
       get().viewProfile(fullNotification._fromUserId);
     }
   },
@@ -498,32 +497,26 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     const otherUsers = Object.values(users).filter((u) => u.id !== currentUserId);
     const liker = otherUsers[Math.floor(Math.random() * otherUsers.length)];
 
-    // Only like if not already liked
     if (!post.likes.includes(liker.id)) {
       get().toggleLike(post.id, liker.id);
     }
   },
 
-  generateRandomFriendAdd: () => {
-    const { users, currentUserId, friendships } = get();
+  generateRandomFollow: () => {
+    const { users, currentUserId, follows } = get();
     const otherUsers = Object.values(users).filter((u) => u.id !== currentUserId);
 
-    // Pick a random user who isn't already a friend
-    const nonFriends = otherUsers.filter(
-      (u) => !friendships.some((f) => f.userId === currentUserId && f.friendId === u.id)
+    const nonFollowing = otherUsers.filter(
+      (u) => !follows.some((f) => f.followerId === currentUserId && f.followingId === u.id)
     );
 
-    if (nonFriends.length > 0) {
-      const newFriend = nonFriends[Math.floor(Math.random() * nonFriends.length)];
-      // Simulate them adding "You"
+    if (nonFollowing.length > 0) {
+      const newFollow = nonFollowing[Math.floor(Math.random() * nonFollowing.length)];
+      // Simulate them following "You"
       set((state) => ({
-        friendships: [
-          ...state.friendships,
-          { userId: currentUserId, friendId: newFriend.id },
-          { userId: newFriend.id, friendId: currentUserId },
-        ],
+        follows: [...state.follows, { followerId: newFollow.id, followingId: currentUserId }],
       }));
-      get().generateNotification('friend_request', newFriend.id);
+      get().generateNotification('follow', newFollow.id);
     }
   },
 }));
