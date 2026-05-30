@@ -16,10 +16,7 @@ interface SocialStore {
   isSearching: boolean;
   searchQuery: string;
   searchResults: User[];
-  isLoadingMore: boolean;
-  hasMorePosts: boolean;
-  displayedPostsCount: number;
-  scrollTargetPostId: string | null;
+  focusedPostId: string | null;
 
   // Notification state
   notifications: Notification[];
@@ -53,10 +50,8 @@ interface SocialStore {
   unfollowUser: (userId: string) => void;
   isFollowing: (userId: string) => boolean;
 
-  // Feed actions
-  loadMorePosts: () => void;
-  scrollToPost: (postId: string) => void;
-  clearScrollTarget: () => void;
+  // Post detail
+  clearFocusedPost: () => void;
 
   // Profile actions
   updateBio: (bio: string) => void;
@@ -124,10 +119,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   isSearching: false,
   searchQuery: '',
   searchResults: [],
-  isLoadingMore: false,
-  hasMorePosts: initialPosts.length > POSTS_PER_PAGE,
-  displayedPostsCount: POSTS_PER_PAGE,
-  scrollTargetPostId: null,
+  focusedPostId: null,
 
   // Notification state
   notifications: [],
@@ -172,8 +164,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   },
 
   getFeedPosts: () => {
-    const { posts, displayedPostsCount } = get();
-    return posts.slice(0, displayedPostsCount);
+    const { posts } = get();
+    return posts.slice(0, POSTS_PER_PAGE);
   },
 
   hasLiked: (postId: string) => {
@@ -221,7 +213,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
       const hasLiked = post.likes.includes(likerId);
 
-      if (!hasLiked && post.userId !== likerId) {
+      // Only notify if someone else likes "You"'s post
+      if (!hasLiked && post.userId !== likerId && post.userId === get().currentUserId) {
         get().generateNotification('like', likerId, postId);
       }
 
@@ -258,7 +251,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     }));
 
     const post = get().posts.find((p) => p.id === postId);
-    if (post && post.userId !== commenterId) {
+    // Only notify if someone else comments on "You"'s post
+    if (post && post.userId !== commenterId && post.userId === get().currentUserId) {
       get().generateNotification('comment', commenterId, postId);
     }
   },
@@ -294,24 +288,10 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     return follows.some((f) => f.followerId === currentUserId && f.followingId === userId);
   },
 
-  // ============ Feed Actions ============
+  // ============ Post Detail ============
 
-  loadMorePosts: () => {
-    const { posts, displayedPostsCount } = get();
-    const newCount = Math.min(displayedPostsCount + POSTS_PER_PAGE, posts.length);
-    set({
-      isLoadingMore: false,
-      displayedPostsCount: newCount,
-      hasMorePosts: newCount < posts.length,
-    });
-  },
-
-  scrollToPost: (postId: string) => {
-    set({ scrollTargetPostId: postId });
-  },
-
-  clearScrollTarget: () => {
-    set({ scrollTargetPostId: null });
+  clearFocusedPost: () => {
+    set({ focusedPostId: null });
   },
 
   // ============ Profile Actions ============
@@ -444,10 +424,11 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     if (fullNotification._type === 'like' || fullNotification._type === 'comment') {
       if (fullNotification._postId) {
         get().setActiveTab('feed');
-        get().scrollToPost(fullNotification._postId);
+        set({ focusedPostId: fullNotification._postId });
       }
     }
     if (fullNotification._type === 'follow') {
+      set({ focusedPostId: null });
       get().viewProfile(fullNotification._fromUserId);
     }
   },
@@ -512,7 +493,6 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
     if (nonFollowing.length > 0) {
       const newFollow = nonFollowing[Math.floor(Math.random() * nonFollowing.length)];
-      // Simulate them following "You"
       set((state) => ({
         follows: [...state.follows, { followerId: newFollow.id, followingId: currentUserId }],
       }));

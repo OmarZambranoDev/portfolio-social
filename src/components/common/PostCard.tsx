@@ -13,6 +13,7 @@ interface PostCardProps {
   onLike: () => void;
   onAddComment: (content: string) => void;
   onAuthorClick?: (userId: string) => void;
+  showCommentsAlways?: boolean;
 }
 
 export function PostCard({
@@ -24,8 +25,9 @@ export function PostCard({
   onLike,
   onAddComment,
   onAuthorClick,
+  showCommentsAlways = false,
 }: PostCardProps) {
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(showCommentsAlways);
   const [commentText, setCommentText] = useState('');
 
   if (!author) return null;
@@ -45,11 +47,12 @@ export function PostCard({
     }
   };
 
+  const effectiveShowComments = showCommentsAlways || showComments;
+
   return (
     <Card variant="outline" className="border-earth-stone/70">
       <CardContent className="p-4">
         <div className="flex gap-3">
-          {/* Author Avatar */}
           <Avatar
             src={author.avatar}
             alt={author.name}
@@ -59,7 +62,6 @@ export function PostCard({
           />
 
           <div className="flex-1 min-w-0">
-            {/* Author Name + Timestamp */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onAuthorClick?.(author.id)}
@@ -72,12 +74,10 @@ export function PostCard({
               </span>
             </div>
 
-            {/* Post Content */}
             <p className="text-sm text-earth-forest mt-1 leading-relaxed whitespace-pre-wrap">
               {post.content}
             </p>
 
-            {/* Like + Comment Actions */}
             <div className="flex items-center gap-4 mt-3">
               <Button
                 variant="outline"
@@ -91,27 +91,35 @@ export function PostCard({
                 <span className="text-xs">{post.likes.length}</span>
               </Button>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowComments(!showComments)}
-                className={`flex items-center gap-1 border-transparent ${
-                  showComments ? 'text-primary' : 'text-earth-moss hover:text-primary'
-                }`}
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span className="text-xs">{post.comments.length}</span>
-                {post.comments.length > 0 &&
-                  (showComments ? (
-                    <ChevronUp className="w-3 h-3" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  ))}
-              </Button>
+              {!showCommentsAlways && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowComments(!showComments)}
+                  className={`flex items-center gap-1 border-transparent ${
+                    showComments ? 'text-primary' : 'text-earth-moss hover:text-primary'
+                  }`}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-xs">{post.comments.length}</span>
+                  {post.comments.length > 0 &&
+                    (showComments ? (
+                      <ChevronUp className="w-3 h-3" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3" />
+                    ))}
+                </Button>
+              )}
+
+              {showCommentsAlways && (
+                <div className="flex items-center gap-1 text-xs text-earth-moss">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>{post.comments.length}</span>
+                </div>
+              )}
             </div>
 
-            {/* Comments Section */}
-            {showComments && (
+            {effectiveShowComments && (
               <div className="mt-3 pt-3 border-t border-earth-stone/20 space-y-3">
                 {post.comments.length === 0 ? (
                   <p className="text-xs text-earth-moss">No comments yet.</p>
@@ -142,7 +150,6 @@ export function PostCard({
                   })
                 )}
 
-                {/* Add Comment Input */}
                 <div className="flex gap-2">
                   <Avatar
                     src={currentUser.avatar}

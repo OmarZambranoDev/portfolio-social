@@ -13,7 +13,7 @@ export function Header({ onSearchClick }: HeaderProps) {
   const removeNotification = useSocialStore((state) => state.removeNotification);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-earth-stone/30">
+    <div className="flex items-center justify-between px-4 py-3">
       <h1 className="text-xl font-bold text-earth-forest">Social</h1>
       <div className="flex items-center gap-2">
         <button

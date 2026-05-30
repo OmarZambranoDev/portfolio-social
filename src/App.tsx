@@ -7,6 +7,7 @@ import { FeedView } from './components/desktop/FeedView';
 import { FollowingView } from './components/desktop/FollowingView';
 import { ProfileView } from './components/desktop/ProfileView';
 import { SearchView } from './components/desktop/SearchView';
+import { PostDetailView } from './components/common/PostDetailView';
 
 const feedScrollState = {
   top: 0,
@@ -35,6 +36,7 @@ export default function App() {
   const currentUserId = useSocialStore((s) => s.currentUserId);
   const viewedUserId = useSocialStore((s) => s.viewedUserId);
   const isSearching = useSocialStore((s) => s.isSearching);
+  const focusedPostId = useSocialStore((s) => s.focusedPostId);
   const setSearching = useSocialStore((s) => s.setSearching);
 
   const generateRandomPost = useSocialStore((s) => s.generateRandomPost);
@@ -43,11 +45,13 @@ export default function App() {
   const generateRandomFollow = useSocialStore((s) => s.generateRandomFollow);
 
   const showScrollTop = useFeedScrollState();
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
     const handleWindowScroll = () => {
       feedScrollState.top = window.scrollY;
       feedScrollState.listener?.();
+      setHasScrolled(window.scrollY > 0);
     };
 
     window.addEventListener('scroll', handleWindowScroll, { passive: true });
@@ -104,7 +108,10 @@ export default function App() {
     return () => clearTimeout(timeout);
   }, [generateRandomFollow]);
 
-  const showOverlay = (viewedUserId !== null && viewedUserId !== currentUserId) || isSearching;
+  const showOverlay =
+    (viewedUserId !== null && viewedUserId !== currentUserId) ||
+    isSearching ||
+    focusedPostId !== null;
 
   const handleScrollToTop = useCallback(() => {
     let current = document.querySelector('[data-feed-scroll]')?.parentElement;
@@ -121,18 +128,23 @@ export default function App() {
     <ToastProvider>
       <div className="h-full bg-gradient-to-b from-earth-stone/20 via-white to-earth-sand/20">
         <div className="max-w-[680px] mx-auto h-full flex flex-col">
-          <Header onSearchClick={() => setSearching(true)} />
+          <div
+            className={`sticky top-0 z-30 bg-earth-stone/20 backdrop-blur-md ${hasScrolled ? 'rounded-b-xl shadow-md' : ''}`}
+          >
+            <Header onSearchClick={() => setSearching(true)} />
+          </div>
 
           {showOverlay ? (
             <>
-              {viewedUserId !== null && viewedUserId !== currentUserId && (
-                <ProfileView userId={viewedUserId} showBack />
-              )}
-              {isSearching && <SearchView />}
+              {focusedPostId !== null && <PostDetailView />}
+              {viewedUserId !== null &&
+                viewedUserId !== currentUserId &&
+                focusedPostId === null && <ProfileView userId={viewedUserId} showBack />}
+              {isSearching && focusedPostId === null && viewedUserId === null && <SearchView />}
             </>
           ) : (
             <>
-              <div className="px-4 pt-4 pb-2 border-b border-earth-stone/30">
+              <div className="px-4 pt-4 pb-2 border-b border-earth-stone/30 bg-earth-stone/20 backdrop-blur-md rounded-b-xl">
                 <Tabs
                   value={activeTab}
                   onValueChange={(value) => setActiveTab(value as 'feed' | 'following' | 'profile')}

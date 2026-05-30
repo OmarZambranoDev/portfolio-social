@@ -19,16 +19,12 @@ export function FeedView({ scrollState }: FeedViewProps) {
   const allPosts = useSocialStore((s) => s.posts);
   const currentUserId = useSocialStore((s) => s.currentUserId);
   const follows = useSocialStore((s) => s.follows);
-  const scrollTargetPostId = useSocialStore((s) => s.scrollTargetPostId);
-  const clearScrollTarget = useSocialStore((s) => s.clearScrollTarget);
   const viewProfile = useSocialStore((s) => s.viewProfile);
 
-  // Compute followed user IDs (reactive)
   const followingIds = new Set(
     follows.filter((f) => f.followerId === currentUserId).map((f) => f.followingId)
   );
 
-  // Filter all posts to only show followed users + own posts
   const relevantPosts = allPosts.filter(
     (p) => p.userId === currentUserId || followingIds.has(p.userId)
   );
@@ -53,14 +49,12 @@ export function FeedView({ scrollState }: FeedViewProps) {
     }
   }, [scrollState]);
 
-  // Initialize ONCE
   if (!initializedRef.current && relevantPosts.length > 0) {
     visiblePostsRef.current = relevantPosts.slice(0, POSTS_PER_PAGE);
     prevRelevantPostsLength.current = relevantPosts.length;
     initializedRef.current = true;
   }
 
-  // Sync visible posts with store when comments/likes change
   useEffect(() => {
     if (!initializedRef.current) return;
 
@@ -81,7 +75,6 @@ export function FeedView({ scrollState }: FeedViewProps) {
     }
   }, [allPosts]);
 
-  // Watch for new posts
   useEffect(() => {
     if (!initializedRef.current) return;
 
@@ -115,7 +108,6 @@ export function FeedView({ scrollState }: FeedViewProps) {
     rerender();
   }, [relevantPosts.length, relevantPosts, currentUserId]);
 
-  // Infinite scroll
   useEffect(() => {
     const loader = loaderRef.current;
     if (!loader) return;
@@ -136,28 +128,6 @@ export function FeedView({ scrollState }: FeedViewProps) {
     return () => observer.disconnect();
   }, [relevantPosts]);
 
-  // Scroll to target post
-  useEffect(() => {
-    if (!scrollTargetPostId) return;
-
-    const postIndex = allPosts.findIndex((p) => p.id === scrollTargetPostId);
-    if (postIndex >= 0) {
-      if (postIndex >= displayedCountRef.current) {
-        const nextCount = postIndex + 1;
-        visiblePostsRef.current = allPosts.slice(0, nextCount);
-        displayedCountRef.current = nextCount;
-        pendingRef.current = [];
-        setNewPostsCount(0);
-        rerender();
-      }
-      setTimeout(() => {
-        const el = document.getElementById(`post-${scrollTargetPostId}`);
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 150);
-    }
-    clearScrollTarget();
-  }, [scrollTargetPostId, allPosts, clearScrollTarget]);
-
   const handleShowNewPosts = useCallback(() => {
     visiblePostsRef.current = [...pendingRef.current, ...visiblePostsRef.current];
     pendingRef.current = [];
@@ -175,7 +145,7 @@ export function FeedView({ scrollState }: FeedViewProps) {
         {newPostsCount > 0 && (
           <button
             onClick={handleShowNewPosts}
-            className="sticky top-0 z-10 w-full py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors shadow-md"
+            className="sticky top-[57px] z-20 w-full py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors shadow-md"
           >
             {newPostsCount} new post{newPostsCount !== 1 ? 's' : ''} — tap to see
           </button>
