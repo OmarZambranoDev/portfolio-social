@@ -140,7 +140,7 @@ export default function App() {
               {viewedUserId !== null &&
                 viewedUserId !== currentUserId &&
                 focusedPostId === null && <ProfileView userId={viewedUserId} showBack />}
-              {isSearching && focusedPostId === null && viewedUserId === null && <SearchView />}
+              {isSearching && focusedPostId === null && <SearchView />}
             </>
           ) : (
             <>

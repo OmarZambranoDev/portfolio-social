@@ -33,6 +33,34 @@ const MOCK_CONTENT = [
   'The amount of JavaScript fatigue is real, but the ecosystem keeps improving.',
 ];
 
+const MOCK_COMMENTS = [
+  'Totally agree with this!',
+  'Great point, thanks for sharing.',
+  "This is exactly what I've been thinking.",
+  "Couldn't have said it better myself.",
+  'Love this perspective!',
+  'Haha, so relatable 😂',
+  'Adding this to my reading list.',
+  'Thanks for the insight!',
+  'This made my day.',
+  'Well said!',
+  'Interesting take, never thought of it that way.',
+  "I've had the same experience.",
+  "Wish I'd known this sooner.",
+  'This is gold. Bookmarking for later.',
+  'The accuracy of this post 😅',
+  "You're on fire lately with these posts!",
+  'This deserves more likes.',
+  'Preach! 🙌',
+  'As a fellow dev, I feel this deeply.',
+  'Could use more details on this approach.',
+  'LGTM! 👍',
+  'Ship it! 🚀',
+  'Clean code, nice work!',
+  "I'm stealing this idea 😄",
+  'This is the content I come here for.',
+];
+
 const MOCK_USERS: Omit<User, 'id'>[] = [
   {
     name: 'Alex Chen',
@@ -234,7 +262,7 @@ export function generatePosts(users: User[]): Post[] {
       post.comments.push({
         id: generateId(),
         userId: commenter.id,
-        content: randomElement(MOCK_CONTENT.slice(0, 10)),
+        content: randomElement(MOCK_COMMENTS),
         timestamp: post.timestamp + randomInt(60000, 3600000),
       });
     }
@@ -262,7 +290,7 @@ export function generatePosts(users: User[]): Post[] {
       post.comments.push({
         id: generateId(),
         userId: commenter.id,
-        content: randomElement(MOCK_CONTENT.slice(10)),
+        content: randomElement(MOCK_COMMENTS),
         timestamp: post.timestamp + randomInt(60000, 3600000),
       });
     }

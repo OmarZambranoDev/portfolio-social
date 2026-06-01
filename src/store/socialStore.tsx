@@ -334,7 +334,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
   setSearching: (searching: boolean) => {
     if (searching) {
-      set({ isSearching: true, searchQuery: '' });
+      set({ isSearching: true, searchQuery: '', viewedUserId: null, focusedPostId: null });
     } else {
       set({ isSearching: false, searchQuery: '', searchResults: [] });
     }
@@ -383,6 +383,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
     let message = '';
     let icon: React.ReactNode = null;
+    let snippet = '';
 
     switch (type) {
       case 'like':
@@ -399,9 +400,17 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         break;
     }
 
+    // Get post snippet for like/comment notifications
+    if (postId && (type === 'like' || type === 'comment')) {
+      const post = get().posts.find((p) => p.id === postId);
+      if (post) {
+        snippet = post.content.length > 80 ? post.content.slice(0, 80) + '...' : post.content;
+      }
+    }
+
     const notification: Notification = {
       id: `notif-${generateId()}`,
-      message,
+      message: snippet ? `${message}: "${snippet}"` : message,
       timestamp: Date.now(),
       read: false,
       icon,
