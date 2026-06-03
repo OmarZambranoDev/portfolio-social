@@ -27,7 +27,6 @@ export function ProfileView({ userId, showBack = false }: ProfileViewProps) {
 
   const isCurrentUser = userId === currentUserId;
 
-  // Reactive subscription — re-renders when follows change
   const isFollowing = follows.some(
     (f) => f.followerId === currentUserId && f.followingId === userId
   );

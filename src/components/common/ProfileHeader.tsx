@@ -3,6 +3,9 @@ import { Avatar, Button, Card, CardContent } from '@OmarZambranoDev/portfolio-ui
 import { UserPlus, UserX, Edit3, Check, X } from 'lucide-react';
 import type { User } from '../../types/social';
 
+const HOST_URL = import.meta.env.VITE_HOST_URL || 'http://localhost:3000';
+const GITHUB_URL = 'https://github.com/OmarZambranoDev/portfolio-social';
+
 interface ProfileHeaderProps {
   user: User;
   isCurrentUser: boolean;
@@ -86,6 +89,56 @@ export function ProfileHeader({
                 Edit Bio
               </Button>
             )}
+          </div>
+        )}
+
+        {isCurrentUser && !editingBio && (
+          <div className="mt-4 pt-4 border-t border-earth-stone/20 space-y-3">
+            <div>
+              <p className="text-xs font-semibold text-earth-sage uppercase tracking-wider mb-1">
+                Links
+              </p>
+              <div className="space-y-1">
+                <div>
+                  <a href={HOST_URL} className="inline-block text-sm text-primary hover:underline">
+                    omarzambrano.dev
+                  </a>
+                </div>
+                <div>
+                  <a
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-sm text-primary hover:underline"
+                  >
+                    github.com/portfolio-social
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-earth-sage uppercase tracking-wider mb-1">
+                Projects
+              </p>
+              <div className="space-y-1">
+                <div>
+                  <a
+                    href={`${HOST_URL}/music`}
+                    className="inline-block text-sm text-primary hover:underline"
+                  >
+                    Music Player
+                  </a>
+                </div>
+                <div>
+                  <a
+                    href={`${HOST_URL}/trade`}
+                    className="inline-block text-sm text-primary hover:underline"
+                  >
+                    Trade App
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
