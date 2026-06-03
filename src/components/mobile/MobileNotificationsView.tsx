@@ -47,16 +47,18 @@ export function MobileNotificationsView({ onBack }: MobileNotificationsViewProps
                 !notification.read ? 'bg-primary/5' : ''
               }`}
             >
-              <div className="flex-shrink-0 mt-0.5">{notification.icon}</div>
+              <div className="flex-shrink-0 mt-0.5 relative">
+                {notification.icon}
+                {!notification.read && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-earth-burnt rounded-full" />
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-earth-forest">{notification.message}</p>
                 <p className="text-xs text-earth-moss mt-0.5">
                   {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
                 </p>
               </div>
-              {!notification.read && (
-                <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5" />
-              )}
               <span
                 onClick={(e) => {
                   e.stopPropagation();

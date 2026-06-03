@@ -121,9 +121,8 @@ const MOCK_CONTENT_SIM = [
   'Just wrapped up a massive PR. Time for a walk and some fresh air.',
 ];
 
-let idCounter = 0;
 function generateId(): string {
-  return `${performance.now().toString(36).replace('.', '-')}-${idCounter++}-${Math.random().toString(36).slice(2, 9)}`;
+  return crypto.randomUUID();
 }
 
 export const useSocialStore = create<SocialStore>((set, get) => ({

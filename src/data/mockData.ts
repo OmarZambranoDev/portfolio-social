@@ -198,9 +198,8 @@ function randomSubset<T>(arr: T[], min: number, max: number): T[] {
   return shuffled.slice(0, count);
 }
 
-let idCounter = 0;
 function generateId(): string {
-  return `${performance.now().toString(36).replace('.', '-')}-${idCounter++}-${Math.random().toString(36).slice(2, 9)}`;
+  return crypto.randomUUID();
 }
 
 export function generateUsers(): User[] {

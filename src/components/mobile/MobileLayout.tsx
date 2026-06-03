@@ -153,7 +153,7 @@ export function MobileLayout() {
         >
           <Bell className="w-5 h-5" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-earth-burnt rounded-full" />
+            <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-earth-burnt rounded-full" />
           )}
         </button>
       </div>
