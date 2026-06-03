@@ -7,19 +7,14 @@ import type { Post } from '../../types/social';
 
 const POSTS_PER_PAGE = 10;
 
-interface FeedViewProps {
-  scrollState?: {
-    top: number;
-    listener: (() => void) | null;
-    scrollContainerRef: HTMLDivElement | null;
-  };
+interface MobileFeedViewProps {
+  onUserClick: (userId: string) => void;
 }
 
-export function FeedView({ scrollState }: FeedViewProps) {
+export function MobileFeedView({ onUserClick }: MobileFeedViewProps) {
   const allPosts = useSocialStore((s) => s.posts);
   const currentUserId = useSocialStore((s) => s.currentUserId);
   const follows = useSocialStore((s) => s.follows);
-  const viewProfile = useSocialStore((s) => s.viewProfile);
 
   const followingIds = new Set(
     follows.filter((f) => f.followerId === currentUserId).map((f) => f.followingId)
@@ -125,47 +120,46 @@ export function FeedView({ scrollState }: FeedViewProps) {
     visiblePostsRef.current = [...pendingRef.current, ...visiblePostsRef.current];
     pendingRef.current = [];
     setNewPostsCount(0);
-    scrollState?.scrollContainerRef?.scrollTo({ top: 0, behavior: 'smooth' });
+    const main = document.querySelector('main');
+    main?.scrollTo({ top: 0, behavior: 'smooth' });
     rerender();
-  }, [scrollState]);
+  }, []);
 
   const visiblePosts = visiblePostsRef.current;
   const hasMorePosts = displayedCountRef.current < relevantPosts.length;
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <div className="flex-1 px-4 py-4 space-y-4">
-        {newPostsCount > 0 && (
-          <button
-            onClick={handleShowNewPosts}
-            className="sticky top-[57px] z-20 w-full py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors shadow-md"
-          >
-            {newPostsCount} new post{newPostsCount !== 1 ? 's' : ''} — tap to see
-          </button>
-        )}
+    <div className="px-4 py-4 space-y-4">
+      {newPostsCount > 0 && (
+        <button
+          onClick={handleShowNewPosts}
+          className="sticky top-0 z-10 w-full py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors shadow-md"
+        >
+          {newPostsCount} new post{newPostsCount !== 1 ? 's' : ''} — tap to see
+        </button>
+      )}
 
-        <NewPostInput />
+      <NewPostInput />
 
-        {visiblePosts.map((post) => (
-          <FeedPostItem key={post.id} post={post} onAuthorClick={(userId) => viewProfile(userId)} />
-        ))}
+      {visiblePosts.map((post) => (
+        <MobileFeedPostItem key={post.id} post={post} onAuthorClick={onUserClick} />
+      ))}
 
-        <div ref={loaderRef} className="flex items-center justify-center py-6">
-          {hasMorePosts ? (
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm text-earth-moss">Loading more posts...</span>
-            </div>
-          ) : visiblePosts.length > 0 ? (
-            <span className="text-sm text-earth-moss">You're all caught up!</span>
-          ) : null}
-        </div>
+      <div ref={loaderRef} className="flex items-center justify-center py-6">
+        {hasMorePosts ? (
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm text-earth-moss">Loading more posts...</span>
+          </div>
+        ) : visiblePosts.length > 0 ? (
+          <span className="text-sm text-earth-moss">You're all caught up!</span>
+        ) : null}
       </div>
     </div>
   );
 }
 
-function FeedPostItem({
+function MobileFeedPostItem({
   post,
   onAuthorClick,
 }: {

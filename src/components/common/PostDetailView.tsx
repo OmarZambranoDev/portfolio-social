@@ -3,7 +3,11 @@ import { usePostCard } from '../../hooks/usePostCard';
 import { PostCard } from './PostCard';
 import { ChevronLeft } from 'lucide-react';
 
-export function PostDetailView() {
+interface PostDetailViewProps {
+  onBack?: () => void;
+}
+
+export function PostDetailView({ onBack }: PostDetailViewProps) {
   const focusedPostId = useSocialStore((s) => s.focusedPostId);
   const clearFocusedPost = useSocialStore((s) => s.clearFocusedPost);
   const allPosts = useSocialStore((s) => s.posts);
@@ -14,11 +18,16 @@ export function PostDetailView() {
   const post = allPosts.find((p) => p.id === focusedPostId);
   if (!post) return null;
 
+  const handleBack = () => {
+    clearFocusedPost();
+    onBack?.();
+  };
+
   return (
     <div className="flex-1 flex flex-col">
       <div className="px-4 pt-4 pb-2">
         <button
-          onClick={clearFocusedPost}
+          onClick={handleBack}
           className="flex items-center gap-1 text-sm text-earth-moss hover:text-earth-forest"
         >
           <ChevronLeft className="w-4 h-4" />

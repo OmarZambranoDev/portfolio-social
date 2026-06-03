@@ -10,6 +10,7 @@ interface UserCardProps {
   onUnfollow: (userId: string) => void;
   onClick: (userId: string) => void;
   showFollowButton?: boolean;
+  clickable?: boolean;
 }
 
 export function UserCard({
@@ -20,11 +21,12 @@ export function UserCard({
   onUnfollow,
   onClick,
   showFollowButton = true,
+  clickable = true,
 }: UserCardProps) {
   return (
     <Card
       variant="outline"
-      clickable
+      clickable={clickable}
       onClick={() => onClick(user.id)}
       className="border-earth-stone/70"
     >
@@ -51,7 +53,11 @@ export function UserCard({
                   variant="outline"
                   size="sm"
                   onClick={() => onUnfollow(user.id)}
-                  className="flex items-center gap-1 border-earth-stone/40 text-earth-moss hover:text-red-600 hover:border-red-300 flex-shrink-0 ml-3"
+                  className={`flex items-center gap-1 border-earth-stone/40 flex-shrink-0 ml-3 ${
+                    clickable
+                      ? 'text-earth-moss hover:text-red-600 hover:border-red-300'
+                      : 'text-earth-moss'
+                  }`}
                 >
                   <UserX className="w-3.5 h-3.5" />
                   <span className="text-xs">Unfollow</span>

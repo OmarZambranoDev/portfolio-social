@@ -200,7 +200,7 @@ function randomSubset<T>(arr: T[], min: number, max: number): T[] {
 
 let idCounter = 0;
 function generateId(): string {
-  return `${Date.now()}-${idCounter++}-${Math.random().toString(36).slice(2, 7)}`;
+  return `${performance.now().toString(36).replace('.', '-')}-${idCounter++}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 export function generateUsers(): User[] {

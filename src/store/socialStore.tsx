@@ -99,11 +99,31 @@ const MOCK_CONTENT_SIM = [
   'Spent the afternoon optimizing bundle size. Tree shaking is your friend.',
   'Just discovered React Hook Form. Where has this been all my life?',
   'The future of the web is exciting. WASM, WebGPU, multi-threading in the browser.',
+  'Refactored the auth flow today. Much cleaner now.',
+  'Why is CSS centering still a mystery in 2024?',
+  'Just hit 1000 contributions on GitHub this year. Consistency pays off.',
+  'The new junior dev on our team is crushing it. Love seeing that growth.',
+  'Spent way too long on a regex today. Should have just used a parser.',
+  'Hot take: TypeScript enums are overrated. Union types for the win.',
+  'Finally understanding the event loop after 5 years of JavaScript.',
+  'Migrated from Webpack to Vite. Build times went from 45s to 2s. Insane.',
+  'Who else names their git branches after emojis? 🐛🚀🔥',
+  'Code reviews are the best way to level up your skills. Change my mind.',
+  'Just learned about the View Transitions API. The future of SPAs is bright.',
+  'Spent the morning writing documentation. Future me will be grateful.',
+  'Anyone else spend more time configuring ESLint than actually coding?',
+  'Shipped a feature with zero bugs on the first try. Buying a lottery ticket.',
+  'The satisfaction of deleting 1000 lines of dead code is unmatched.',
+  'Just discovered CSS container queries. Where have these been all my life?',
+  'Working from a coffee shop today. The background noise is surprisingly productive.',
+  'TypeScript 5.5 is looking really good. The inferred type predicates are a game changer.',
+  'TIL you can use the `in` operator as a type guard in TypeScript. Mind blown.',
+  'Just wrapped up a massive PR. Time for a walk and some fresh air.',
 ];
 
 let idCounter = 0;
 function generateId(): string {
-  return `${Date.now()}-${idCounter++}-${Math.random().toString(36).slice(2, 7)}`;
+  return `${performance.now().toString(36).replace('.', '-')}-${idCounter++}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 export const useSocialStore = create<SocialStore>((set, get) => ({
@@ -347,9 +367,9 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
       return;
     }
     set({ searchQuery: query, isSearching: true });
-    const results = Object.values(users).filter(
-      (u) => u.id !== currentUserId && u.name.toLowerCase().includes(query.toLowerCase())
-    );
+    const results = Object.values(users)
+      .filter((u) => u.id !== currentUserId && u.name.toLowerCase().includes(query.toLowerCase()))
+      .sort((a, b) => a.name.localeCompare(b.name));
     set({ searchResults: results });
   },
 
