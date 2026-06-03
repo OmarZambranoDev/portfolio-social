@@ -10,6 +10,7 @@ interface ProfileHeaderProps {
   onFollow: () => void;
   onUnfollow: () => void;
   onUpdateBio: (bio: string) => void;
+  clickable?: boolean;
 }
 
 export function ProfileHeader({
@@ -19,6 +20,7 @@ export function ProfileHeader({
   onFollow,
   onUnfollow,
   onUpdateBio,
+  clickable = true,
 }: ProfileHeaderProps) {
   const [editingBio, setEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState(user.bio);
@@ -94,7 +96,11 @@ export function ProfileHeader({
                 variant="outline"
                 size="sm"
                 onClick={onUnfollow}
-                className="border-earth-stone/40 text-earth-moss hover:text-red-600 hover:border-red-300"
+                className={`border-earth-stone/40 flex-shrink-0 ${
+                  clickable
+                    ? 'text-earth-moss hover:text-red-600 hover:border-red-300'
+                    : 'text-earth-moss'
+                }`}
               >
                 <UserX className="w-3.5 h-3.5" />
                 Unfollow

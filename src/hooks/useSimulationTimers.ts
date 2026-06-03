@@ -17,8 +17,7 @@ export function useSimulationTimers() {
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     const scheduleNext = () => {
-      // const delay = 15000 + Math.random() * 10000;
-      const delay = 1000;
+      const delay = 15000 + Math.random() * 10000;
       timeout = setTimeout(() => {
         generateRandomComment();
         scheduleNext();
@@ -46,8 +45,7 @@ export function useSimulationTimers() {
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     const scheduleNext = () => {
-      // const delay = 45000 + Math.random() * 30000;
-      const delay = 1000;
+      const delay = 45000 + Math.random() * 30000;
       timeout = setTimeout(() => {
         generateRandomFollow();
         scheduleNext();

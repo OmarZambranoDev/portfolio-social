@@ -24,14 +24,20 @@ export function UserCard({
   clickable = true,
 }: UserCardProps) {
   return (
-    <Card
-      variant="outline"
-      clickable={clickable}
-      onClick={() => onClick(user.id)}
-      className="border-earth-stone/70"
-    >
+    <Card variant="outline" className="border-earth-stone/70">
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
+        <div
+          className={`flex items-center justify-between ${clickable ? 'cursor-pointer' : ''}`}
+          onClick={() => clickable && onClick(user.id)}
+          role={clickable ? 'button' : undefined}
+          tabIndex={clickable ? 0 : undefined}
+          onKeyDown={(e) => {
+            if (clickable && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              onClick(user.id);
+            }
+          }}
+        >
           <div className="flex items-center gap-3 min-w-0">
             <Avatar src={user.avatar} alt={user.name} size="md" className="flex-shrink-0" />
             <div className="min-w-0">

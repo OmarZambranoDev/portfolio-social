@@ -56,6 +56,7 @@ export function MobileProfileView({ userId, onBack }: MobileProfileViewProps) {
           onFollow={() => followUser(userId)}
           onUnfollow={() => unfollowUser(userId)}
           onUpdateBio={updateBio}
+          clickable={false}
         />
 
         {!isCurrentUser && (

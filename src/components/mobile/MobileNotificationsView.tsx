@@ -1,5 +1,5 @@
 import { useSocialStore } from '../../store/socialStore';
-import { ChevronLeft, Heart, MessageCircle, UserPlus } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface MobileNotificationsViewProps {
@@ -11,19 +11,6 @@ export function MobileNotificationsView({ onBack }: MobileNotificationsViewProps
   const markAllNotificationsRead = useSocialStore((s) => s.markAllNotificationsRead);
   const removeNotification = useSocialStore((s) => s.removeNotification);
   const handleNotificationClick = useSocialStore((s) => s.handleNotificationClick);
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'like':
-        return <Heart className="w-4 h-4 text-earth-rose" fill="currentColor" />;
-      case 'comment':
-        return <MessageCircle className="w-4 h-4 text-primary" />;
-      case 'follow':
-        return <UserPlus className="w-4 h-4 text-earth-sage" />;
-      default:
-        return null;
-    }
-  };
 
   const handleClick = (notification: (typeof notifications)[number]) => {
     handleNotificationClick({ id: notification.id });
@@ -60,9 +47,7 @@ export function MobileNotificationsView({ onBack }: MobileNotificationsViewProps
                 !notification.read ? 'bg-primary/5' : ''
               }`}
             >
-              <div className="flex-shrink-0 mt-0.5">
-                {notification.icon || getIcon(notification._type)}
-              </div>
+              <div className="flex-shrink-0 mt-0.5">{notification.icon}</div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-earth-forest">{notification.message}</p>
                 <p className="text-xs text-earth-moss mt-0.5">
@@ -72,15 +57,25 @@ export function MobileNotificationsView({ onBack }: MobileNotificationsViewProps
               {!notification.read && (
                 <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5" />
               )}
-              <button
+              <span
                 onClick={(e) => {
                   e.stopPropagation();
                   removeNotification(notification.id);
                 }}
-                className="text-earth-moss hover:text-earth-forest flex-shrink-0"
+                className="text-earth-moss hover:text-earth-forest flex-shrink-0 cursor-pointer p-1"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeNotification(notification.id);
+                  }
+                }}
+                aria-label="Remove notification"
               >
                 ✕
-              </button>
+              </span>
             </button>
           ))
         )}
