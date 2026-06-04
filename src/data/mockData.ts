@@ -175,7 +175,7 @@ const YOUR_SEED_POSTS = [
   'Working on my micro-frontend portfolio project! Setting up the host app and configuring Module Federation for the Vite remotes.',
   'Just got the social feed micro-frontend working with the host. The remote app loads dynamically — so cool to see it in action!',
   'Debugging shared dependencies between the host and remote apps. Zustand state management is working great across the federated modules.',
-  'The portfolio is coming together! Got the UI library shared across all apps. Check out the host: https://github.com/OmarZambranoDev/portfolio-landing-vite and the remotes: https://github.com/OmarZambranoDev/portfolio-music, https://github.com/OmarZambranoDev/portfolio-trade',
+  'The portfolio is coming together! Got the UI library shared across all apps. Check out the <a href="https://github.com/OmarZambranoDev/portfolio-landing-vite" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Host App</a>, <a href="https://github.com/OmarZambranoDev/portfolio-music" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Music App</a>, and <a href="https://github.com/OmarZambranoDev/portfolio-trade-app" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Trade App</a>.',
   'Module Federation is powerful but the configuration has to be just right. Learning a lot about how Vite handles federated modules.',
   'Just wrapped up the Trade app — stock charts with lightweight-charts, mock WebSocket for real-time prices, and a full portfolio tracker. Three remotes down!',
   'Version enforcement is saving me hours of debugging. Every remote checks against the host versions.json before building. No more React version mismatches.',

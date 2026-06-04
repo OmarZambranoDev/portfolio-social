@@ -13,13 +13,13 @@ interface FeedViewProps {
     listener: (() => void) | null;
     scrollContainerRef: HTMLDivElement | null;
   };
+  onAuthorClick: (userId: string) => void;
 }
 
-export function FeedView({ scrollState }: FeedViewProps) {
+export function FeedView({ scrollState, onAuthorClick }: FeedViewProps) {
   const allPosts = useSocialStore((s) => s.posts);
   const currentUserId = useSocialStore((s) => s.currentUserId);
   const follows = useSocialStore((s) => s.follows);
-  const viewProfile = useSocialStore((s) => s.viewProfile);
 
   const followingIds = new Set(
     follows.filter((f) => f.followerId === currentUserId).map((f) => f.followingId)
@@ -147,7 +147,7 @@ export function FeedView({ scrollState }: FeedViewProps) {
         <NewPostInput />
 
         {visiblePosts.map((post) => (
-          <FeedPostItem key={post.id} post={post} onAuthorClick={(userId) => viewProfile(userId)} />
+          <FeedPostItem key={post.id} post={post} onAuthorClick={onAuthorClick} />
         ))}
 
         <div ref={loaderRef} className="flex items-center justify-center py-6">

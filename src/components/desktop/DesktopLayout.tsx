@@ -39,6 +39,7 @@ export function DesktopLayout() {
   const isSearching = useSocialStore((s) => s.isSearching);
   const focusedPostId = useSocialStore((s) => s.focusedPostId);
   const setSearching = useSocialStore((s) => s.setSearching);
+  const viewProfile = useSocialStore((s) => s.viewProfile);
 
   const showScrollTop = useFeedScrollState();
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -69,6 +70,14 @@ export function DesktopLayout() {
   const handleScrollToTop = useCallback(() => {
     feedScrollState.scrollContainerRef?.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  const handleAuthorClick = (userId: string) => {
+    if (userId === currentUserId) {
+      setActiveTab('profile');
+    } else {
+      viewProfile(userId);
+    }
+  };
 
   return (
     <div
@@ -111,7 +120,9 @@ export function DesktopLayout() {
               </Tabs>
             </div>
 
-            {activeTab === 'feed' && <FeedView scrollState={feedScrollState} />}
+            {activeTab === 'feed' && (
+              <FeedView scrollState={feedScrollState} onAuthorClick={handleAuthorClick} />
+            )}
             {activeTab === 'following' && <FollowingView />}
             {activeTab === 'profile' && <ProfileView userId={currentUserId} />}
           </>

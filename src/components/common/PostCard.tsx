@@ -74,9 +74,16 @@ export function PostCard({
               </span>
             </div>
 
-            <p className="text-sm text-earth-forest mt-1 leading-relaxed whitespace-pre-wrap">
-              {post.content}
-            </p>
+            {post.content.includes('<a href=') ? (
+              <p
+                className="text-sm text-earth-forest mt-1 leading-relaxed whitespace-pre-wrap [&_a]:text-earth-sand"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            ) : (
+              <p className="text-sm text-earth-forest mt-1 leading-relaxed whitespace-pre-wrap">
+                {post.content}
+              </p>
+            )}
 
             <div className="flex items-center gap-4 mt-3">
               <Button

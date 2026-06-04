@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const outputPath = resolve(__dirname, '..', '.canonical-versions.json');
 
 const HOST_VERSIONS_URL =
-  'https://raw.githubusercontent.com/OmarZambranoDev/portfolio-landing-vite/main/versions.json';
+  'https://raw.githubusercontent.com/OmarZambranoDev/portfolio-landing-vite/main/versions.json?t=' + Date.now();
 
 // Delete cached file so we always get the latest
 if (existsSync(outputPath)) {
