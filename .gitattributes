@@ -1,0 +1,3 @@
+dist/** linguist-generated=true
+dist/** -linguist-detectable
+*.html linguist-detectable=false

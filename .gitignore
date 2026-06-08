@@ -5,3 +5,5 @@ dist
 *.local
 .env
 .mf
+playwright-report/
+test-results/
