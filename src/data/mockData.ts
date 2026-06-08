@@ -65,102 +65,102 @@ const MOCK_USERS: Omit<User, 'id'>[] = [
   {
     name: 'Alex Chen',
     bio: 'Full-stack developer passionate about React and Node.js. Building cool stuff on the web since 2018.',
-    avatar: 'https://picsum.photos/seed/alexchen/200',
+    avatar: 'https://picsum.photos/seed/alexchen/100',
   },
   {
     name: 'Sarah Johnson',
     bio: 'UX engineer bridging design and development. Accessibility advocate and CSS enthusiast.',
-    avatar: 'https://picsum.photos/seed/sarahjohnson/200',
+    avatar: 'https://picsum.photos/seed/sarahjohnson/100',
   },
   {
     name: 'Mike Rodriguez',
     bio: 'Backend developer specializing in distributed systems. Go and Rust enthusiast. Open source contributor.',
-    avatar: 'https://picsum.photos/seed/mikerodriguez/200',
+    avatar: 'https://picsum.photos/seed/mikerodriguez/100',
   },
   {
     name: 'Emily Park',
     bio: 'Mobile developer focusing on React Native. Coffee addict and hackathon organizer.',
-    avatar: 'https://picsum.photos/seed/emilypark/200',
+    avatar: 'https://picsum.photos/seed/emilypark/100',
   },
   {
     name: 'David Kim',
     bio: 'DevOps engineer automating everything. Kubernetes enthusiast and homelab tinkerer.',
-    avatar: 'https://picsum.photos/seed/davidkim/200',
+    avatar: 'https://picsum.photos/seed/davidkim/100',
   },
   {
     name: 'Lisa Thompson',
     bio: 'Data scientist turned frontend developer. Love creating beautiful data visualizations with D3.',
-    avatar: 'https://picsum.photos/seed/lisathompson/200',
+    avatar: 'https://picsum.photos/seed/lisathompson/100',
   },
   {
     name: 'James Wilson',
     bio: 'Startup CTO building products from 0 to 1. Full-stack with a focus on developer experience.',
-    avatar: 'https://picsum.photos/seed/jameswilson/200',
+    avatar: 'https://picsum.photos/seed/jameswilson/100',
   },
   {
     name: 'Maria Garcia',
     bio: 'QA engineer who breaks things for a living. Passionate about test automation and quality culture.',
-    avatar: 'https://picsum.photos/seed/mariagarcia/200',
+    avatar: 'https://picsum.photos/seed/mariagarcia/100',
   },
   {
     name: 'Chris Taylor',
     bio: 'Frontend architect designing component libraries. Design systems are my love language.',
-    avatar: 'https://picsum.photos/seed/christaylor/200',
+    avatar: 'https://picsum.photos/seed/christaylor/100',
   },
   {
     name: 'Anna Lee',
     bio: 'Junior developer documenting my coding journey. Sharing what I learn every day.',
-    avatar: 'https://picsum.photos/seed/annalee/200',
+    avatar: 'https://picsum.photos/seed/annalee/100',
   },
   {
     name: 'Tom Brown',
     bio: 'Game developer exploring web technologies. Building multiplayer experiences with WebSockets.',
-    avatar: 'https://picsum.photos/seed/tombrown/200',
+    avatar: 'https://picsum.photos/seed/tombrown/100',
   },
   {
     name: 'Rachel Green',
     bio: 'Tech lead managing a remote team across 4 time zones. Writing about leadership and architecture.',
-    avatar: 'https://picsum.photos/seed/rachelgreen/200',
+    avatar: 'https://picsum.photos/seed/rachelgreen/100',
   },
   {
     name: 'Daniel Martinez',
     bio: 'Security researcher focused on web application security. Bug bounty hunter in my free time.',
-    avatar: 'https://picsum.photos/seed/danielmartinez/200',
+    avatar: 'https://picsum.photos/seed/danielmartinez/100',
   },
   {
     name: 'Jessica White',
     bio: 'API developer designing RESTful services. Documentation is my superpower.',
-    avatar: 'https://picsum.photos/seed/jessicawhite/200',
+    avatar: 'https://picsum.photos/seed/jessicawhite/100',
   },
   {
     name: 'Ryan Adams',
     bio: 'Blockchain developer building DeFi applications. Web3 enthusiast and Solidity developer.',
-    avatar: 'https://picsum.photos/seed/ryanadams/200',
+    avatar: 'https://picsum.photos/seed/ryanadams/100',
   },
   {
     name: 'Amanda Clark',
     bio: 'Tech writer and developer advocate. Translating complex concepts into clear documentation.',
-    avatar: 'https://picsum.photos/seed/amandaclark/200',
+    avatar: 'https://picsum.photos/seed/amandaclark/100',
   },
   {
     name: 'Kevin Nguyen',
     bio: 'Performance engineer optimizing web applications. Millisecond matters.',
-    avatar: 'https://picsum.photos/seed/kevinnguyen/200',
+    avatar: 'https://picsum.photos/seed/kevinnguyen/100',
   },
   {
     name: 'Olivia Brown',
     bio: 'AI/ML engineer exploring the intersection of machine learning and web development.',
-    avatar: 'https://picsum.photos/seed/oliviabrown/200',
+    avatar: 'https://picsum.photos/seed/oliviabrown/100',
   },
   {
     name: 'Jason Patel',
     bio: 'Freelance developer working with startups worldwide. Digital nomad since 2020.',
-    avatar: 'https://picsum.photos/seed/jasonpatel/200',
+    avatar: 'https://picsum.photos/seed/jasonpatel/100',
   },
   {
     name: 'Sophia Turner',
     bio: 'Backend developer who loves databases. PostgreSQL is my happy place.',
-    avatar: 'https://picsum.photos/seed/sophiaturner/200',
+    avatar: 'https://picsum.photos/seed/sophiaturner/100',
   },
 ];
 
@@ -168,14 +168,14 @@ const CURRENT_USER: User = {
   id: 'current-user',
   name: 'You',
   bio: 'Building a micro-frontend portfolio project with host and remote applications. Learning Module Federation and sharing components across apps.',
-  avatar: 'https://picsum.photos/seed/currentuser/200',
+  avatar: 'https://picsum.photos/seed/currentuser/100',
 };
 
 const YOUR_SEED_POSTS = [
   'Working on my micro-frontend portfolio project! Setting up the host app and configuring Module Federation for the Vite remotes.',
   'Just got the social feed micro-frontend working with the host. The remote app loads dynamically — so cool to see it in action!',
   'Debugging shared dependencies between the host and remote apps. Zustand state management is working great across the federated modules.',
-  'The portfolio is coming together! Got the UI library shared across all apps. Check out the <a href="https://github.com/OmarZambranoDev/portfolio-landing-vite" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Host App</a>, <a href="https://github.com/OmarZambranoDev/portfolio-music" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Music App</a>, and <a href="https://github.com/OmarZambranoDev/portfolio-trade-app" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Trade App</a>.',
+  'The portfolio is coming together! Got the UI library shared across all apps. Check out the <a href="https://github.com/OmarZambranoDev/portfolio-landing-vite" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Host App</a>, <a href="https://github.com/OmarZambranoDev/portfolio-music" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Music App</a>, and <a href="https://github.com/OmarZambranoDev/portfolio-trade" class="text-earth-sand" target="_blank" rel="noopener noreferrer">Trade App</a>.',
   'Module Federation is powerful but the configuration has to be just right. Learning a lot about how Vite handles federated modules.',
   'Just wrapped up the Trade app — stock charts with lightweight-charts, mock WebSocket for real-time prices, and a full portfolio tracker. Three remotes down!',
   'Version enforcement is saving me hours of debugging. Every remote checks against the host versions.json before building. No more React version mismatches.',
@@ -222,11 +222,9 @@ export function generateFollows(users: User[]): Follow[] {
     }
   };
 
-  // "You" follows exactly 5 users
   const youFollows = randomSubset(users.slice(1), 5, 5);
   youFollows.forEach((f) => addFollow(CURRENT_USER.id, f.id));
 
-  // Other users follow 3-8 users each
   users.slice(1).forEach((user) => {
     const followCount = randomInt(3, 8);
     const potentialFollows = users.filter((u) => u.id !== user.id);
