@@ -92,15 +92,15 @@ export function DesktopLayout() {
         </div>
 
         {showOverlay ? (
-          <>
+          <main className="flex-1 flex flex-col">
             {focusedPostId !== null && <PostDetailView />}
             {viewedUserId !== null && viewedUserId !== currentUserId && focusedPostId === null && (
               <ProfileView userId={viewedUserId} showBack />
             )}
             {isSearching && focusedPostId === null && <SearchView />}
-          </>
+          </main>
         ) : (
-          <>
+          <main className="flex-1 flex flex-col">
             <div className="px-4 pt-4 pb-2 border-b border-earth-stone/30 bg-earth-stone/20 backdrop-blur-md rounded-b-xl">
               <Tabs
                 value={activeTab}
@@ -125,7 +125,7 @@ export function DesktopLayout() {
             )}
             {activeTab === 'following' && <FollowingView />}
             {activeTab === 'profile' && <ProfileView userId={currentUserId} />}
-          </>
+          </main>
         )}
       </div>
 
