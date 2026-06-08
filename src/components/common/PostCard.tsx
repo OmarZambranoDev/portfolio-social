@@ -66,6 +66,7 @@ export function PostCard({
               <button
                 onClick={() => onAuthorClick?.(author.id)}
                 className="font-semibold text-earth-forest text-sm hover:underline text-left"
+                aria-label={`View ${author.name}'s profile`}
               >
                 {author.name}
               </button>
@@ -90,8 +91,8 @@ export function PostCard({
                 variant="outline"
                 size="sm"
                 onClick={onLike}
-                className={`flex items-center gap-1 border-transparent ${
-                  hasLiked ? 'text-earth-rose' : 'text-earth-moss hover:text-earth-rose'
+                className={`flex items-center gap-1 border-transparent focus:outline-none focus-visible:ring-0 btn-like ${
+                  hasLiked ? 'text-earth-rose' : 'text-earth-moss'
                 }`}
               >
                 <Heart className="w-4 h-4" fill={hasLiked ? 'currentColor' : 'none'} />
@@ -103,7 +104,7 @@ export function PostCard({
                   variant="outline"
                   size="sm"
                   onClick={() => setShowComments(!showComments)}
-                  className={`flex items-center gap-1 border-transparent ${
+                  className={`flex items-center gap-1 border-transparent focus:outline-none focus-visible:ring-0 ${
                     showComments ? 'text-primary' : 'text-earth-moss hover:text-primary'
                   }`}
                 >

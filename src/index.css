@@ -9,3 +9,9 @@ body,
   margin: 0;
   padding: 0;
 }
+
+@media (hover: hover) {
+  .btn-like:hover {
+    color: #b3423a;
+  }
+}
